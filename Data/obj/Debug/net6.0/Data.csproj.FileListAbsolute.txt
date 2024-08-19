@@ -1,0 +1,14 @@
+D:\MovieManagement\Data\bin\Debug\net6.0\Data.deps.json
+D:\MovieManagement\Data\bin\Debug\net6.0\Data.runtimeconfig.json
+D:\MovieManagement\Data\bin\Debug\net6.0\Data.dll
+D:\MovieManagement\Data\bin\Debug\net6.0\Data.pdb
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.csproj.AssemblyReference.cache
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.AssemblyInfoInputs.cache
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.AssemblyInfo.cs
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.csproj.CoreCompileInputs.cache
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.dll
+D:\MovieManagement\Data\obj\Debug\net6.0\refint\Data.dll
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.pdb
+D:\MovieManagement\Data\obj\Debug\net6.0\Data.genruntimeconfig.cache
+D:\MovieManagement\Data\obj\Debug\net6.0\ref\Data.dll
