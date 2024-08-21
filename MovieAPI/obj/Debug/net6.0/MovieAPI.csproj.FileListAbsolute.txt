@@ -68,3 +68,5 @@ D:\MovieManagement\MovieAPI\obj\Debug\net6.0\MovieAPI.genruntimeconfig.cache
 D:\MovieManagement\MovieAPI\obj\Debug\net6.0\ref\MovieAPI.dll
 D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Humanizer.dll
 D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\AutoMapper.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

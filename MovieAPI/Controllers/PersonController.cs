@@ -1,4 +1,5 @@
-﻿using Data.DataContext;
+﻿using AutoMapper;
+using Data.DataContext;
 using Data.Entities;
 using Data.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,9 +13,11 @@ namespace MovieAPI.Controllers
     public class PersonController : ControllerBase
     {
         private readonly MovieDbContext _context;
-        public PersonController(MovieDbContext context)
+        private readonly IMapper _mapper;
+        public PersonController(MovieDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -24,13 +27,7 @@ namespace MovieAPI.Controllers
             try
             {
                 var actorCount = _context.Person.Count();
-                var actorList = _context.Person.Skip(pageIndex * pageSize).Take(pageSize).
-                    Select(x => new ActorViewModel
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        DateOfBirth = x.DateOfBirth
-                    }).ToList();
+                var actorList = _mapper.Map<List<ActorViewModel>>(_context.Person.Skip(pageIndex * pageSize).Take(pageSize).ToList());
 
                 response.Status = true;
                 response.Message = "Success";
@@ -61,13 +58,7 @@ namespace MovieAPI.Controllers
                     response.Message = "Record not exist";
                     return BadRequest(response);
                 }
-                var personData = new ActorDetailViewModel
-                {
-                    Id = person.Id,
-                    Name = person.Name,
-                    DateOfBirth = person.DateOfBirth,
-                    Movies = _context.Movie.Where(x => x.Actors.Contains(person)).Select(x => x.Title).ToArray()
-                };
+                var personData = _mapper.Map<ActorDetailViewModel>(person);
 
                 response.Status = true;
                 response.Message = "Success";
@@ -92,11 +83,7 @@ namespace MovieAPI.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var postedModel = new PersonEntity()
-                    {
-                        Name = model.Name,
-                        DateOfBirth = model.DateOfBirth
-                    };
+                    var postedModel = _mapper.Map<PersonEntity>(model);
                     _context.Person.Add(postedModel);
                     _context.SaveChanges();
 
@@ -116,6 +103,33 @@ namespace MovieAPI.Controllers
                 }
             }
             catch (Exception)
+            {
+                response.Status = false;
+                response.Message = "Something went wrong";
+                return BadRequest(response);
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(Guid id)
+        {
+            var response = new BaseResponseModel();
+            try
+            {
+                var person = _context.Person.Where(item => item.Id == id).FirstOrDefault();
+                if(person == null)
+                {
+                    response.Status = false;
+                    response.Message = "Invalid record";
+                    return BadRequest(response);
+                }
+                _context.Person.Remove(person);
+                _context.SaveChanges();
+                response.Status = true;
+                response.Message = "Deleted successfully";
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
                 response.Status = false;
                 response.Message = "Something went wrong";

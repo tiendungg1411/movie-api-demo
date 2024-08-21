@@ -1,4 +1,5 @@
-﻿using Data.DataContext;
+﻿using AutoMapper;
+using Data.DataContext;
 using Data.Entities;
 using Data.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,9 +13,11 @@ namespace MovieAPI.Controllers
     public class MovieController : ControllerBase
     {
         private readonly MovieDbContext _context;
-        public MovieController(MovieDbContext context)
+        private readonly IMapper _mapper;
+        public MovieController(MovieDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -24,21 +27,8 @@ namespace MovieAPI.Controllers
             try
             {
                 var movieCount = _context.Movie.Count();
-                var movieList = _context.Movie.Include(item => item.Actors).Skip(pageIndex * pageSize).Take(pageSize).
-                    Select(x => new MovieListViewModel
-                    {
-                        Id = x.Id,
-                        Title = x.Title,
-                        Actors = x.Actors.Select(y => new ActorViewModel
-                        {
-                            Id = y.Id,
-                            Name = y.Name,
-                            DateOfBirth = y.DateOfBirth
-                        }).ToList(),
-                        CoverImage = x.CoverImage,
-                        Language = x.Language,
-                        ReleaseDate = x.ReleaseDate
-                    }).ToList();
+                var movieList = _mapper.Map<List<MovieListViewModel>>(_context.Movie.Include(item => item.Actors)
+                    .Skip(pageIndex * pageSize).Take(pageSize).ToList());
 
                 response.Status = true;
                 response.Message = "Success";
@@ -61,22 +51,8 @@ namespace MovieAPI.Controllers
             BaseResponseModel response = new BaseResponseModel();
             try
             {
-                var movie = _context.Movie.Include(item => item.Actors).Where(x => x.Title.Contains(name)).
-                    Select(x => new MovieDetailViewModel
-                    {
-                        Id = x.Id,
-                        Title = x.Title,
-                        Actors = x.Actors.Select(y => new ActorViewModel
-                        {
-                            Id = y.Id,
-                            Name = y.Name,
-                            DateOfBirth = y.DateOfBirth
-                        }).ToList(),
-                        CoverImage = x.CoverImage,
-                        Language = x.Language,
-                        ReleaseDate = x.ReleaseDate,
-                        Description = x.Description
-                    }).FirstOrDefault();
+                var movie = _mapper.Map<MovieDetailViewModel>(_context.Movie.Include(item => item.Actors)
+                    .Where(x => x.Title.Contains(name)).FirstOrDefault());
 
                 if (movie == null)
                 {
@@ -114,33 +90,12 @@ namespace MovieAPI.Controllers
                         response.Message = "Invalid Actor assigned.";
                         return BadRequest(response);
                     }
-                    var postedModel = new MovieEntity()
-                    {
-                        Title = model.Title,
-                        ReleaseDate = model.ReleaseDate,
-                        Language = model.Language,
-                        CoverImage = model.CoverImage,
-                        Description = model.Description,
-                        Actors = actors
-                    };
+                    var postedModel = _mapper.Map<MovieEntity>(model);
+                    postedModel.Actors = actors;
                     _context.Movie.Add(postedModel);
                     _context.SaveChanges();
 
-                    var responseData = new MovieDetailViewModel
-                    {
-                        Id = postedModel.Id,
-                        Title = postedModel.Title,
-                        Actors = postedModel.Actors.Select(y => new ActorViewModel
-                        {
-                            Id = y.Id,
-                            Name = y.Name,
-                            DateOfBirth = y.DateOfBirth
-                        }).ToList(),
-                        CoverImage = postedModel.CoverImage,
-                        Language = postedModel.Language,
-                        ReleaseDate = postedModel.ReleaseDate,
-                        Description = postedModel.Description
-                    };
+                    var responseData = _mapper.Map<MovieDetailViewModel>(postedModel);
 
                     response.Status = true;
                     response.Message = "Created successfully.";
@@ -155,10 +110,10 @@ namespace MovieAPI.Controllers
                     return BadRequest(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 response.Status = false;
-                response.Message = "Something went wrong";
+                response.Message = "Something went wrong  " + ex.Message;
                 return BadRequest(response);
             }
         }
@@ -186,12 +141,6 @@ namespace MovieAPI.Controllers
                         response.Message = "Invalid movie record";
                         return BadRequest(response);
                     }
-                    movieDetail.CoverImage = model.CoverImage;
-                    movieDetail.Description = model.Description;
-                    movieDetail.Language = model.Language;
-                    movieDetail.Title = model.Title;
-                    movieDetail.ReleaseDate = model.ReleaseDate;
-
                     // Find removed actors
                     var removedActors = movieDetail.Actors.Where(item => !model.Actors.Contains(item.Id)).ToList();
                     foreach (var actor in removedActors)
@@ -205,22 +154,14 @@ namespace MovieAPI.Controllers
                     {
                         movieDetail.Actors.Add(actor);
                     }
+                    movieDetail.CoverImage = model.CoverImage;
+                    movieDetail.Description = model.Description;
+                    movieDetail.Language = model.Language;
+                    movieDetail.Title = model.Title;
+                    movieDetail.ReleaseDate = model.ReleaseDate;
+                    movieDetail.Actors = actors;
                     _context.SaveChanges();
-                    var responseData = new MovieDetailViewModel
-                    {
-                        Id = movieDetail.Id,
-                        Title = movieDetail.Title,
-                        Actors = movieDetail.Actors.Select(y => new ActorViewModel
-                        {
-                            Id = y.Id,
-                            Name = y.Name,
-                            DateOfBirth = y.DateOfBirth
-                        }).ToList(),
-                        CoverImage = movieDetail.CoverImage,
-                        Language = movieDetail.Language,
-                        ReleaseDate = movieDetail.ReleaseDate,
-                        Description = movieDetail.Description
-                    };
+                    var responseData = _mapper.Map<MovieDetailViewModel>(movieDetail);
 
                     response.Status = true;
                     response.Message = "Updated successfully.";
@@ -235,7 +176,34 @@ namespace MovieAPI.Controllers
                     return BadRequest(response);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
+            {
+                response.Status = false;
+                response.Message = "Something went wrong " + ex.Message ;
+                return BadRequest(response);
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(Guid id)
+        {
+            BaseResponseModel response = new BaseResponseModel();
+            try
+            {
+                var movie = _context.Movie.Where(item => item.Id == id).FirstOrDefault();
+                if(movie == null)
+                {
+                    response.Status = false;
+                    response.Message = "Invalid record";
+                    return BadRequest(response);
+                }
+                _context.Movie.Remove(movie);
+                _context.SaveChanges();
+                response.Status = true;
+                response.Message = "Deleted successfully";
+                return Ok(response);
+            }
+            catch (Exception ex)
             {
                 response.Status = false;
                 response.Message = "Something went wrong";
