@@ -5,6 +5,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 namespace MovieAPI.Controllers
 {
@@ -45,14 +46,14 @@ namespace MovieAPI.Controllers
             }
         }
 
-        [HttpGet("{name}")]
-        public IActionResult GetMovieByName(string name)
+        [HttpGet("{id}")]
+        public IActionResult GetMovieById(Guid id)
         {
             BaseResponseModel response = new BaseResponseModel();
             try
             {
                 var movie = _mapper.Map<MovieDetailViewModel>(_context.Movie.Include(item => item.Actors)
-                    .Where(x => x.Title.Contains(name)).FirstOrDefault());
+                    .Where(x => x.Id == id).FirstOrDefault());
 
                 if (movie == null)
                 {
@@ -208,6 +209,48 @@ namespace MovieAPI.Controllers
                 response.Status = false;
                 response.Message = "Something went wrong";
                 return BadRequest(response);
+            }
+        }
+
+        [HttpPost]
+        [Route("upload-movie-poster")]
+        public async Task<IActionResult> UploadMoviePoster(IFormFile imageFile)
+        {
+            try
+            {
+                var fileName = ContentDispositionHeaderValue.Parse(imageFile.ContentDisposition).FileName.TrimStart('\"').TrimEnd('\"');
+                string newPath = @"D:\MoviePoster";
+                if (!Directory.Exists(newPath))
+                {
+                    Directory.CreateDirectory(newPath);
+                }
+                string[] allowedImageExtensions = new string[] { ".jpg", ".jpeg", ".png" };
+                if(!allowedImageExtensions.Contains(Path.GetExtension(fileName)))
+                {
+                    return BadRequest(new BaseResponseModel
+                    {
+                        Status = false,
+                        Message = "Only .jpg, .jped, .png type files are allowed."
+                    });
+                }
+
+                string newFileName = Guid.NewGuid() + Path.GetExtension(fileName);
+                string fullFilePath = Path.Combine(newPath, newFileName);
+
+                using (var stream = new FileStream(fullFilePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+                return Ok(new { ProfileImage = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/StaticFiles/{newFileName}"});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new BaseResponseModel
+                {
+                    Status = false,
+                    Message = "Something went wrong"
+                });
+                
             }
         }
     }

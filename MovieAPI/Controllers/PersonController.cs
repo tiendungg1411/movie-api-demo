@@ -44,13 +44,13 @@ namespace MovieAPI.Controllers
             }
         }
 
-        [HttpGet("{name}")]
-        public IActionResult GetPersonByName(string name)
+        [HttpGet("{id}")]
+        public IActionResult GetPersonById(Guid id)
         {
             BaseResponseModel response = new BaseResponseModel();
             try
             {
-                var person = _context.Person.Where(x => x.Name.Contains(name)).FirstOrDefault();
+                var person = _context.Person.Where(x => x.Id == id).FirstOrDefault();
 
                 if (person == null)
                 {
@@ -69,6 +69,31 @@ namespace MovieAPI.Controllers
             catch (Exception)
             {
                 //TODO: do logging exceptions
+                response.Status = false;
+                response.Message = "Something went wrong";
+                return BadRequest(response);
+            }
+        }
+
+        [HttpGet]
+        [Route("Search/{searchText}")]
+        public IActionResult Get(string searchText)
+        {
+            BaseResponseModel response = new BaseResponseModel();
+            try
+            {
+                var searchPerson = _context.Person.Where(x => x.Name.Contains(searchText)).Select(x => new
+                {
+                    x.Id,
+                    x.Name,
+                }).ToList();
+                response.Status = true;
+                response.Message = "Success";
+                response.Data = searchPerson;
+                return Ok(response);
+            }
+            catch (Exception)
+            {
                 response.Status = false;
                 response.Message = "Something went wrong";
                 return BadRequest(response);
@@ -134,6 +159,47 @@ namespace MovieAPI.Controllers
                 response.Status = false;
                 response.Message = "Something went wrong";
                 return BadRequest(response);
+            }
+        }
+
+        [HttpPut]
+        public IActionResult Put(ActorViewModel model)
+        {
+            BaseResponseModel response = new BaseResponseModel();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var postedModel = _mapper.Map<PersonEntity>(model);
+                    var personDetail = _context.Person.Where(item => item.Id == model.Id).AsNoTracking().FirstOrDefault();
+                    if (personDetail == null)
+                    {
+                        response.Status = false;
+                        response.Message = "Invalid record";
+                        return BadRequest(response);
+                    }
+                    _context.Person.Update(postedModel);
+                    _context.SaveChanges();
+
+                    response.Status = true;
+                    response.Message = "Updated successfully";
+                    response.Data = model;
+                    return Ok(response);
+                }
+                else
+                {
+                    response.Status = false;
+                    response.Message = "Validation failed";
+                    response.Data = ModelState;
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception)
+            {
+                response.Status = false;
+                response.Message = "Something went wrong";
+                return BadRequest(response);
+                
             }
         }
     }

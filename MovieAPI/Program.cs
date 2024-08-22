@@ -1,6 +1,7 @@
 using AutoMapper;
 using Data.DataContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(@"D:\MoviePoster"),
+    RequestPath = "/StaticFiles"
+});
 
 app.UseHttpsRedirection();
 
