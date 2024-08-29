@@ -16,5 +16,7 @@ namespace Data.Entities
         public DateTime DateOfBirth { get; set; }
         public ICollection<MovieEntity> Movies { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

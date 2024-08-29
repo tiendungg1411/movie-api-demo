@@ -15,7 +15,13 @@ namespace MovieAPI.AutoMapper
 
             CreateMap<PersonEntity, ActorViewModel>();
             CreateMap<PersonEntity, ActorDetailViewModel>();
+            CreateMap<PersonEntity, LoginModel>();
+            CreateMap<PersonEntity, RegisterModel>();
+
             CreateMap<ActorViewModel, PersonEntity>();
+            CreateMap<LoginModel, PersonEntity>();
+            CreateMap<RegisterModel, PersonEntity>();
+            
         }
     }
 }

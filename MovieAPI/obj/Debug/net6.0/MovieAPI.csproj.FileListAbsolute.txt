@@ -70,3 +70,9 @@ D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Humanizer.dll
 D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
 D:\MovieManagement\MovieAPI\bin\Debug\net6.0\AutoMapper.dll
 D:\MovieManagement\MovieAPI\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\BCrypt.Net-Next.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Scrutor.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.dll
+D:\MovieManagement\MovieAPI\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

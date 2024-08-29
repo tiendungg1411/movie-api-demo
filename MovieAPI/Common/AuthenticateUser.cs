@@ -17,7 +17,6 @@ namespace MovieAPI.Common
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
-            // So sánh mật khẩu nhập vào với mật khẩu đã băm
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 

@@ -1,0 +1,58 @@
+# Ignore các tệp thư mục liên quan đến Visual Studio
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore các thư mục tạm thời và đầu ra của dự án .NET
+bin/
+obj/
+Debug/
+Release/
+
+# Ignore tệp cấu hình môi trường
+.env
+
+# Ignore các tệp nhật ký (log)
+*.log
+
+# Ignore thư mục package nếu bạn sử dụng npm/yarn trong dự án .NET
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore các tệp khóa
+*.pfx
+*.p12
+
+# Ignore các tệp dữ liệu nhạy cảm
+*.secret
+*.key
+
+# Ignore tệp cài đặt của hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Ignore các tệp tạo ra bởi trình biên dịch hoặc build system
+*.dll
+*.exe
+*.so
+*.dylib
+*.pdb
+
+# Ignore toàn bộ các thư mục/tệp tạm thời hoặc cache
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# Ignore các tệp cụ thể cho .NET
+*.log
+*.cache
+*.csproj.user
+*.sln.docstates
+
+# Nếu bạn sử dụng các thư viện hoặc gói cài đặt không thuộc quản lý qua NuGet, thêm chúng vào đây:
+packages/

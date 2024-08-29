@@ -1,24 +1,27 @@
 import logo from './logo.svg';
 import './App.css';
+import { Container, Navbar, Nav } from 'react-bootstrap';
+import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
 
+import Landing from './pages/landing';
+import Actors from './pages/actors';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <BrowserRouter>
+        <Navbar bg='dark' variant='dark'>
+          <Navbar.Brand as={Link} to="/">Movie World</Navbar.Brand>
+          <Nav className = "mr-auto">
+            <Nav.Link as={Link} to="/">Movies</Nav.Link>
+            <Nav.Link as={Link} to="/actors">Actors</Nav.Link>
+          </Nav>
+        </Navbar>
+        <Routes>
+          <Route exact path="/"Component={() => <Landing />} />
+          <Route exact path="/actors" Component={() => <Actors />} />
+        </Routes>
+      </BrowserRouter>
+    </Container>
   );
 }
 

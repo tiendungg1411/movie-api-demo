@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using MovieAPI.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
@@ -17,21 +18,23 @@ namespace MovieAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly MovieDbContext _context;
         private readonly IMapper _mapper;
-        public LoginController(IConfiguration configuration, MovieDbContext context, IMapper mapper)
+        private readonly AuthenticateUser _authenticateUser;
+        public LoginController(IConfiguration configuration, MovieDbContext context, IMapper mapper, AuthenticateUser authenticateUser)
         {
             _configuration = configuration;
             _context = context;
             _mapper = mapper;
+            _authenticateUser = authenticateUser;
 
         }
 
         private LoginModel AuthenticateUser(LoginModel model)
         {
-            var userEntity = _context.Person.Where(item => item.Email == model.Email && item.Password == model.Password)
-                .FirstOrDefault();
+            var userEntity = _context.Person.Where(item => item.Email == model.Email).FirstOrDefault();
             if (userEntity != null)
             {
-                return _mapper.Map<LoginModel>(userEntity);
+                var validatePassword = _authenticateUser.VerifyPassword(model.Password, userEntity.Password);
+                if (validatePassword) return _mapper.Map<LoginModel>(userEntity);
             }
             return null;
         }
@@ -52,7 +55,7 @@ namespace MovieAPI.Controllers
         {
             BaseResponseModel response = new BaseResponseModel();
             var user = AuthenticateUser(model);
-            if(user != null)
+            if (user != null)
             {
                 var token = GenerateToken(user);
 
